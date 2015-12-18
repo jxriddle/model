@@ -3,6 +3,7 @@ package model
 
 import (
 	"fmt"
+	"github.com/satori/go.uuid"
 	"regexp"
 	"strings"
 	"time"
@@ -11,7 +12,8 @@ import (
 // Model base class
 type Model struct {
 	// Id is the default primary key of the model
-	Id int64
+	//Id int64
+	Id uuid.UUID
 
 	// CreatedAt stores the creation time of the model and should not be changed after cretion
 	CreatedAt time.Time
@@ -28,7 +30,7 @@ type Model struct {
 
 // Init sets up the model fields
 func (m *Model) Init() {
-	m.Id = 0
+	m.Id = uuid.NewV4()
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
 	m.TableName = ""
@@ -42,17 +44,17 @@ func (m *Model) URLCreate() string {
 
 // URLUpdate returns the update url for this model /table/id/update
 func (m *Model) URLUpdate() string {
-	return fmt.Sprintf("/%s/%d/update", m.TableName, m.Id)
+	return fmt.Sprintf("/%s/%s/update", m.TableName, m.Id)
 }
 
 // URLDestroy returns the destroy url for this model /table/id/destroy
 func (m *Model) URLDestroy() string {
-	return fmt.Sprintf("/%s/%d/destroy", m.TableName, m.Id)
+	return fmt.Sprintf("/%s/%s/destroy", m.TableName, m.Id)
 }
 
 // URLShow returns the show url for this model /table/id
 func (m *Model) URLShow() string {
-	return fmt.Sprintf("/%s/%d", m.TableName, m.Id)
+	return fmt.Sprintf("/%s/%s", m.TableName, m.Id)
 }
 
 // URLIndex returns the index url for this model - /table
@@ -95,21 +97,21 @@ func (m *Model) PrimaryKey() string {
 
 // SelectName returns our name for select menus
 func (m *Model) SelectName() string {
-	return fmt.Sprintf("%s-%d", m.TableName, m.Id) // Usually override with name or a summary
+	return fmt.Sprintf("%s-%s", m.TableName, m.Id) // Usually override with name or a summary
 }
 
 // SelectValue returns our value for select options
 func (m *Model) SelectValue() string {
-	return fmt.Sprintf("%d", m.Id)
+	return fmt.Sprintf("%s", m.Id)
 }
 
 // PrimaryKeyValue returns the unique id
-func (m *Model) PrimaryKeyValue() int64 {
+func (m *Model) PrimaryKeyValue() uuid.UUID {
 	return m.Id
 }
 
 // OwnedBy returns true if the user id passed in owns this model
-func (m *Model) OwnedBy(uid int64) bool {
+func (m *Model) OwnedBy(uid uuid.UUID) bool {
 	// In models composed with base model, you may want to check a user_id field or join table
 	// In this base model, we return false by default
 	return false
@@ -119,12 +121,12 @@ func (m *Model) OwnedBy(uid int64) bool {
 // should we generate a hash of this to ensure we fit in small key size?
 func (m *Model) CacheKey() string {
 	// This should really be some form of hash based on this data...
-	return fmt.Sprintf("%s/%d/%s", m.TableName, m.Id, m.UpdatedAt)
+	return fmt.Sprintf("%s/%s/%s", m.TableName, m.Id, m.UpdatedAt)
 }
 
 // String returns a string representation of the model
 func (m *Model) String() string {
-	return fmt.Sprintf("%s/%d", m.TableName, m.Id)
+	return fmt.Sprintf("%s/%s", m.TableName, m.Id)
 }
 
 // CleanParams returns a params list cleaned of keys not in allowed list
