@@ -5,7 +5,7 @@ An optional base model class and utilities. The package includes some basic fiel
     type Model struct {
     	TableName string
     	KeyName   string
-    	Id        int64
+    	Id        uuid.UUID
     	CreatedAt time.Time
     	UpdatedAt time.Time
     }
